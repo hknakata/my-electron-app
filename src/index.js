@@ -1,6 +1,14 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
+const Store = require('electron-store');
+const store = new Store();
+store.set('isDarkMode', true);
+
+store.onDidChange('isDarkMode', (newValue, oldValue) => {
+  console.log('isDarkMode had changed:', store.get('isDarkMode'));
+});
+
 // Import the Express framework
 const express = require('express');
 
@@ -18,8 +26,12 @@ api.get('/', (req, res) => {
 
 api.get('/api/users/:id', (req, res) => {
   // Create a new user
-  const user = { "id": req.params.id, "name": "hello world"};
+  const user = { "id": req.params.id, "name": "hello world", "isDarkMode": store.get('isDarkMode')};
   
+  // Toogle isDarkMode
+  const isDarkMode = store.get('isDarkMode');
+  store.set('isDarkMode', !isDarkMode);
+
   // Return a user json
   res.json(user);
 });
